@@ -1,0 +1,12 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Bitbot\\": "lib/"
+        }
+    },
+    "require": {
+        "silex/silex": "~2.0",
+        "curl/curl": "~1",
+        "monolog/monolog": "^1.21"
+    }
+}
