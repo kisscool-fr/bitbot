@@ -26,6 +26,7 @@
     "require": {
         "php": "^7.2",
         "curl/curl": "^1.8",
+        "hirak/prestissimo": "^0.3.8",
         "lokhman/silex-config": "^2.0",
         "monolog/monolog": "^1.23",
         "silex/silex": "^2.2",
