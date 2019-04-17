@@ -17,7 +17,7 @@ class Telegram implements NetworkInterface
         $this->app = $app;
         $this->endpoint = sprintf(
             'https://api.telegram.org/bot%s/',
-            $app['config']['network']['telegram']['token']
+            $app['network']['telegram']['token']
         );
 
         $messages = $this->decode();
