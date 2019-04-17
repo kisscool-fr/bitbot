@@ -7,17 +7,56 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class Facebook implements NetworkInterface
+class Slack implements NetworkInterface
 {
     private $app;
 
     public function verifyToken(Request $request, Application $app)
     {
-        if ($request->get('hub_verify_token') == $app['network']['facebook']['app_token']) {
-            return $request->get('hub_challenge');
+        $input = file_get_contents('php://input');
+
+        $app['monolog']->addDebug(file_get_contents('php://input'));
+
+        if (!empty($input)) {
+            $payload = json_decode($input, true);
+
+            if (is_array($payload) && $payload['type'] == 'url_verification' && $payload['token'] == $app['network']['slack']['verification_token']) {
+                return $payload['challenge'];
+            }
         }
 
         return new Response('Failed validation. Make sure the validation tokens match.', 403);
+    }
+
+    public function test(Request $request, Application $app)
+    {
+        if ($request->get('code')) {
+            $parameters = [
+                'client_id' => $app['network']['slack']['client']['id'],
+                'client_secret' => $app['network']['slack']['client']['secret'],
+                'code' => $request->get('code'),
+                'redirect_uri' => $app['network']['slack']['redirect_uri'],
+            ];
+
+            $app['monolog']->addDebug(json_encode($parameters));
+
+            $app['curl']->setopt(CURLOPT_HTTPHEADER, ['Content-Type: application/json; charset=utf-8']);
+            $app['curl']->setopt(CURLOPT_RETURNTRANSFER, true);
+            $app['curl']->setopt(CURLOPT_CONNECTTIMEOUT, 5);
+            $app['curl']->setopt(CURLOPT_TIMEOUT, 60);
+            $app['curl']->post(
+                sprintf('https://slack.com/api/oauth.access'),
+                json_encode($parameters)
+            );
+
+            if ($app['curl']->error) {
+                $app['monolog']->addError($app['curl']->error_code.':'.$app['curl']->response);
+            }
+
+            $app['monolog']->addDebug(json_encode($app['curl']->response));
+        }
+
+        return new Response('<a href="https://slack.com/oauth/authorize?scope=bot&client_id='.$app['network']['slack']['client']['id'].'"><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>', 200);
     }
 
     public function main(Request $request, Application $app)
@@ -69,20 +108,6 @@ class Facebook implements NetworkInterface
         }
     }
 
-    public function sendRandomAnswer($sender)
-    {
-        $answer = (mt_rand(0, 1) > 0.5) ? 'Yes.' : 'No.';
-
-        $this->sendAPIRequestJson('messages', [
-            'recipient' => [
-                'id' => $sender
-            ],
-            'message' => [
-                'text' => $answer
-            ]
-        ]);
-    }
-
     public function sendAPIRequestJson($method, $parameters)
     {
         if (!is_string($method)) {
@@ -102,12 +127,7 @@ class Facebook implements NetworkInterface
         $this->app['curl']->setopt(CURLOPT_CONNECTTIMEOUT, 5);
         $this->app['curl']->setopt(CURLOPT_TIMEOUT, 60);
         $this->app['curl']->post(
-            sprintf(
-                '%s/me/%s?access_token=%s',
-                $this->app['network']['facebook']['api_endpoint'],
-                $method,
-                $this->app['network']['facebook']['page_token']
-            ),
+            '',
             json_encode($parameters)
         );
 
@@ -116,5 +136,19 @@ class Facebook implements NetworkInterface
         }
         
         return $this->app['curl']->response;
+    }
+
+    public function sendRandomAnswer($sender)
+    {
+        $answer = (mt_rand(0, 1) > 0.5) ? 'Yes.' : 'No.';
+
+        $this->sendAPIRequestJson('messages', [
+            'recipient' => [
+                'id' => $sender
+            ],
+            'message' => [
+                'text' => $answer
+            ]
+        ]);
     }
 }

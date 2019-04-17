@@ -1,0 +1,12 @@
+{
+    "env": "%__ENV__%",
+    "debug": true,
+    "network": {
+        "facebook": {
+            "enable": true,
+            "api_endpoint": "https://graph.facebook.com/v3.2",
+            "app_token": "%FB_APP_TOKEN%",
+            "page_token": "%FB_PAGE_TOKEN%"
+        }
+    }
+}

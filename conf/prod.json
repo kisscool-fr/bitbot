@@ -1,0 +1,26 @@
+{
+    "$extends": "dev",
+    "debug": false,
+    "network": {
+        "facebook": {
+            "enable": true,
+            "api_endpoint": "https://graph.facebook.com/v3.2",
+            "app_token": "%FB_APP_TOKEN%",
+            "page_token": "%FB_PAGE_TOKEN%"
+        },
+        "slack": {
+            "enable": false,
+            "bot_token": "%SLACK_BOT_TOKEN%",
+            "verification_token": "%SLACK_VERIFICATION_TOKEN%",
+            "client": {
+                "id": "%SLACK_CLIENT_ID%",
+                "secret": "%SLACK_CLIENT_SECRET%"
+            },
+            "redirect_uri": "https://bitbot.daily.beer/slack"
+        },
+        "telegram": {
+            "enable": true,
+            "token": "%TELEGRAM_TOKEN%"
+        }
+    }
+}

@@ -9,13 +9,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class Telegram implements NetworkInterface
 {
-    const API_URL   = 'https://api.telegram.org/bot'.TELEGRAM_TOKEN.'/';
-
     private $app;
+    private $endpoint;
 
     public function main(Request $request, Application $app)
     {
         $this->app = $app;
+        $this->endpoint = sprintf(
+            'https://api.telegram.org/bot%s/',
+            $app['config']['network']['telegram']['token']
+        );
 
         $messages = $this->decode();
 
@@ -36,12 +39,11 @@ class Telegram implements NetworkInterface
 
         $this->app['monolog']->addDebug($input);
 
-        $data = json_decode($input, true);
+        $data = json_decode((string)$input, true);
 
         $messages = [];
 
-        if (is_array($data) && array_key_exists('message', $data))
-        {
+        if (is_array($data) && array_key_exists('message', $data)) {
             $message = $data['message'];
 
             $datas = [];
@@ -57,8 +59,7 @@ class Telegram implements NetworkInterface
 
     public function process($messages)
     {
-        foreach ($messages as $message)
-        {
+        foreach ($messages as $message) {
             $this->sendRandomAnswer($message['chat_id']);
         }
     }
@@ -71,7 +72,7 @@ class Telegram implements NetworkInterface
 
         if (!$parameters) {
             $parameters = array();
-        } else if (!is_array($parameters)) {
+        } elseif (!is_array($parameters)) {
             return false;
         }
 
@@ -81,7 +82,7 @@ class Telegram implements NetworkInterface
         $this->app['curl']->setopt(CURLOPT_RETURNTRANSFER, true);
         $this->app['curl']->setopt(CURLOPT_CONNECTTIMEOUT, 5);
         $this->app['curl']->setopt(CURLOPT_TIMEOUT, 60);
-        $this->app['curl']->post(self::API_URL, json_encode($parameters));
+        $this->app['curl']->post($this->endpoint, json_encode($parameters));
 
         if ($this->app['curl']->error) {
             $this->app['monolog']->addError($this->app['curl']->error_code.':'.$this->app['curl']->response);
@@ -92,7 +93,7 @@ class Telegram implements NetworkInterface
 
     public function sendRandomAnswer($chat_id)
     {
-        $answer = (mt_rand(0,1) > 0.5) ? 'Yes.' : 'No.';
+        $answer = (mt_rand(0, 1) > 0.5) ? 'Yes.' : 'No.';
 
         $this->sendAPIRequestJson('sendMessage', [
             'chat_id' => $chat_id,
