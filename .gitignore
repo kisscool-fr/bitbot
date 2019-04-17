@@ -16,4 +16,3 @@ bin/php-cs-fixer
 bin/php-parse
 bin/phpstan
 bin/phpunit
-bin/rotate.php
