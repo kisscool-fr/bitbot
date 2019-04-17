@@ -23,6 +23,11 @@
             "Bitbot\\": "lib/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Bitbot\\": "tests/"
+        }
+    },
     "require": {
         "php": "^7.2",
         "curl/curl": "^1.8",
