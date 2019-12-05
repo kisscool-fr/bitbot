@@ -9,6 +9,7 @@ Dockerfile
 docker/
 Makefile
 
+*.code-workspace
 .php_cs.cache
 .phpunit.result.cache
 .DS_Store
@@ -17,3 +18,4 @@ bin/php-cs-fixer
 bin/php-parse
 bin/phpstan
 bin/phpunit
+bin/var-dump-server
