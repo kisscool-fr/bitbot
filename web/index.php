@@ -8,8 +8,7 @@ use Lokhman\Silex\Provider as ToolsProviders;
 
 date_default_timezone_set("Europe/Paris");
 
-$dotenv = Dotenv\Dotenv::create(__DIR__ . '/../');
-$dotenv->load();
+Dotenv\Dotenv::createImmutable(__DIR__ . '/../')->load();
 
 
 $app = new Silex\Application();

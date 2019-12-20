@@ -2,8 +2,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::create(__DIR__ . '/../');
-$dotenv->load();
+Dotenv\Dotenv::createImmutable(__DIR__ . '/../')->load();
 
 $curl = new Curl\Curl();
 
