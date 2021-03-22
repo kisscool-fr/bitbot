@@ -14,7 +14,7 @@
         "bin-dir": "bin/",
         "optimize-autoloader": true,
         "platform": {
-            "php": "7.2.31"
+            "php": "7.2.34"
         },
         "sort-packages": true
     },
@@ -31,7 +31,6 @@
     "require": {
         "php": "^7.2",
         "curl/curl": "^2.3",
-        "hirak/prestissimo": "^0.3",
         "lokhman/silex-config": "^2.0",
         "monolog/monolog": "^1.25",
         "silex/silex": "^2.2",
