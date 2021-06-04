@@ -14,7 +14,7 @@ class Facebook implements NetworkInterface
     public function verifyToken(Request $request, Application $app): Response
     {
         if ($request->get('hub_verify_token') == $app['network']['facebook']['app_token']) {
-            return $request->get('hub_challenge');
+            return new Response($request->get('hub_challenge'));
         }
 
         return new Response('Failed validation. Make sure the validation tokens match.', 403);

@@ -21,7 +21,7 @@ class Slack implements NetworkInterface
             $payload = json_decode($input, true);
 
             if (is_array($payload) && $payload['type'] == 'url_verification' && $payload['token'] == $app['network']['slack']['verification_token']) {
-                return $payload['challenge'];
+                return new Response($payload['challenge']);
             }
         }
 
