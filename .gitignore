@@ -16,6 +16,6 @@ Makefile
 
 bin/php-cs-fixer
 bin/php-parse
-bin/phpstan
+bin/phpstan*
 bin/phpunit
 bin/var-dump-server

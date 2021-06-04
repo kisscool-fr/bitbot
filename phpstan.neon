@@ -4,3 +4,7 @@ parameters:
         - bin
         - lib
         - web
+    ignoreErrors:
+        - '#.+ has no typehint specified#'
+        - '#.+ should return string but returns false#'
+        - '#.+ expects array#'

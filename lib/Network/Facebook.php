@@ -11,7 +11,7 @@ class Facebook implements NetworkInterface
 {
     private $app;
 
-    public function verifyToken(Request $request, Application $app)
+    public function verifyToken(Request $request, Application $app): Response
     {
         if ($request->get('hub_verify_token') == $app['network']['facebook']['app_token']) {
             return $request->get('hub_challenge');
@@ -20,7 +20,7 @@ class Facebook implements NetworkInterface
         return new Response('Failed validation. Make sure the validation tokens match.', 403);
     }
 
-    public function main(Request $request, Application $app)
+    public function main(Request $request, Application $app): Response
     {
         $this->app = $app;
 
@@ -37,7 +37,7 @@ class Facebook implements NetworkInterface
         return new Response('', 200);
     }
 
-    public function decode()
+    public function decode(): array
     {
         $input = file_get_contents('php://input');
         $messages = [];
@@ -62,14 +62,14 @@ class Facebook implements NetworkInterface
         return $messages;
     }
 
-    public function process($messages)
+    public function process(array $messages): void
     {
         foreach ($messages as $message) {
             $this->sendRandomAnswer($message['sender_id']);
         }
     }
 
-    public function sendRandomAnswer($sender)
+    public function sendRandomAnswer(string $sender): void
     {
         $answer = (mt_rand(0, 1) > 0.5) ? 'Yes.' : 'No.';
 
@@ -83,7 +83,7 @@ class Facebook implements NetworkInterface
         ]);
     }
 
-    public function sendAPIRequestJson($method, $parameters)
+    public function sendAPIRequestJson(string $method, array $parameters): string
     {
         if (!is_string($method)) {
             return false;

@@ -11,7 +11,7 @@ class Slack implements NetworkInterface
 {
     private $app;
 
-    public function verifyToken(Request $request, Application $app)
+    public function verifyToken(Request $request, Application $app): Response
     {
         $input = file_get_contents('php://input');
 
@@ -28,7 +28,7 @@ class Slack implements NetworkInterface
         return new Response('Failed validation. Make sure the validation tokens match.', 403);
     }
 
-    public function test(Request $request, Application $app)
+    public function test(Request $request, Application $app): Response
     {
         if ($request->get('code')) {
             $parameters = [
@@ -59,7 +59,7 @@ class Slack implements NetworkInterface
         return new Response('<a href="https://slack.com/oauth/authorize?scope=bot&client_id='.$app['network']['slack']['client']['id'].'"><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>', 200);
     }
 
-    public function main(Request $request, Application $app)
+    public function main(Request $request, Application $app): Response
     {
         $this->app = $app;
 
@@ -76,7 +76,7 @@ class Slack implements NetworkInterface
         return new Response('', 200);
     }
 
-    public function decode()
+    public function decode(): array
     {
         $input = file_get_contents('php://input');
         $messages = [];
@@ -101,14 +101,14 @@ class Slack implements NetworkInterface
         return $messages;
     }
 
-    public function process($messages)
+    public function process(array $messages): void
     {
         foreach ($messages as $message) {
             $this->sendRandomAnswer($message['sender_id']);
         }
     }
 
-    public function sendAPIRequestJson($method, $parameters)
+    public function sendAPIRequestJson(string $method, array $parameters): string
     {
         if (!is_string($method)) {
             return false;
@@ -138,7 +138,7 @@ class Slack implements NetworkInterface
         return $this->app['curl']->response;
     }
 
-    public function sendRandomAnswer($sender)
+    public function sendRandomAnswer(string $sender): void
     {
         $answer = (mt_rand(0, 1) > 0.5) ? 'Yes.' : 'No.';
 
