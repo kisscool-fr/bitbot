@@ -32,10 +32,10 @@
         "php": "^7.2",
         "curl/curl": "^2.3",
         "lokhman/silex-config": "^2.0",
-        "monolog/monolog": "^1.25",
-        "silex/silex": "^2.2",
+        "monolog/monolog": "^1.26",
+        "silex/silex": "^2.3",
         "studio24/rotate": "^1.0",
-        "vlucas/phpdotenv": "^4.1"
+        "vlucas/phpdotenv": "^4.2"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.16",
