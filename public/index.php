@@ -13,7 +13,6 @@ use Monolog\Handler\StreamHandler;
 
 use GuzzleHttp\Client as Curl;
 
-
 require __DIR__ . '/../vendor/autoload.php';
 
 Dotenv\Dotenv::createImmutable(__DIR__ . '/..')->load();
@@ -37,12 +36,12 @@ $container->set('config', function () {
         $content
     );
 
-    $config = Config::load($content, new Json, true);
+    $config = Config::load($content, new Json(), true);
 
     return $config;
 });
 
-$container->set('monolog', function() use($container) {
+$container->set('monolog', function () use ($container) {
     $logger = new Logger('bitbot');
     $logger->pushHandler(
         new StreamHandler(
@@ -54,7 +53,7 @@ $container->set('monolog', function() use($container) {
     return $logger;
 });
 
-$container->set('curl', function() {
+$container->set('curl', function () {
     return new Curl(['connect_timeout' => 5, 'timeout' => 60]);
 });
 
@@ -77,7 +76,7 @@ if ($container->get('config')->get('network.telegram.enable', false)) {
 }
 
 if ($container->get('config')->get('network.slack.enable', false)) {
-    $app->get('/slack',  [\Bitbot\Network\Slack::class, 'test']);
+    $app->get('/slack', [\Bitbot\Network\Slack::class, 'test']);
     $app->post('/slack', [\Bitbot\Network\Slack::class, 'verifyToken']);
 }
 

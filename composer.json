@@ -11,7 +11,6 @@
         }
     ],
     "config": {
-        "bin-dir": "bin/",
         "optimize-autoloader": true,
         "platform": {
             "php": "8.0.28"
@@ -47,9 +46,9 @@
     },
     "scripts": {
         "check": "composer validate --no-check-all --strict",
-        "stan": "./bin/phpstan analyse --configuration=phpstan.neon",
-        "style": "./bin/php-cs-fixer fix ./lib --dry-run --diff --show-progress dots",
-        "style-fix": "./bin/php-cs-fixer fix ./lib --diff --show-progress dots",
-        "test": "./bin/phpunit"
+        "stan": "./vendor/bin/phpstan analyse --configuration=phpstan.neon",
+        "style": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --dry-run --diff --show-progress dots",
+        "style-fix": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --diff --show-progress dots",
+        "test": "./vendor/bin/phpunit"
     }
 }

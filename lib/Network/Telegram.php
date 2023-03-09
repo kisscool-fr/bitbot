@@ -84,7 +84,7 @@ class Telegram implements NetworkInterface
         }
 
         if (!$parameters) {
-            $parameters = array();
+            $parameters = [];
         } elseif (!is_array($parameters)) {
             return false;
         }

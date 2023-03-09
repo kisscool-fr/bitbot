@@ -57,10 +57,10 @@ jobs:
           ${{ runner.os }}-php-
 
     - name: PHPStan
-      run: ./bin/phpstan analyse --configuration=phpstan.neon
+      run: ./vendor/bin/phpstan analyse --configuration=phpstan.neon
 
     - name: PHP-CS-Fixer
-      run: ./bin/php-cs-fixer fix ./lib --dry-run
+      run: ./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --dry-run
 
   test:
     needs: ['pre-check', check]
@@ -84,4 +84,4 @@ jobs:
           ${{ runner.os }}-php-
 
     - name: PHPUnit
-      run: ./bin/phpunit
+      run: ./vendor/bin/phpunit
