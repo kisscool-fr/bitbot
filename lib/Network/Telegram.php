@@ -2,42 +2,52 @@
 
 namespace Bitbot\Network;
 
+use DI\Container;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
+use GuzzleHttp\Psr7;
+use GuzzleHttp\Exception\ClientException;
+
 use Bitbot\NetworkInterface;
-use Silex\Application;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class Telegram implements NetworkInterface
 {
-    private $app;
-    private $endpoint;
+    private Container $container;
+    private string $endpoint;
 
-    public function main(Request $request, Application $app): Response
+    public function __construct(Container $container)
     {
-        $this->app = $app;
+        $this->container = $container;
+    }
+
+    public function main(Request $request, Response $response, array $args): Response
+    {
         $this->endpoint = sprintf(
             'https://api.telegram.org/bot%s/',
-            $app['network']['telegram']['token']
+            $this->container->get('config')->get('network.telegram.token')
         );
 
+        /** @var array<string, array<string, string>> $messages */
         $messages = $this->decode();
 
-        $this->app['monolog']->addDebug('count messages:'.count($messages));
+        $this->container->get('monolog')->debug('count messages:'.count($messages));
 
         if (count($messages) == 0) {
-            return new Response('', 200);
+            $response->getBody()->write('');
+            return $response;
         }
 
         $this->process($messages);
 
-        return new Response('', 200);
+        $response->getBody()->write('');
+        return $response;
     }
 
     public function decode(): array
     {
         $input = file_get_contents('php://input');
 
-        $this->app['monolog']->addDebug($input);
+        $this->container->get('monolog')->debug($input);
 
         $data = json_decode((string)$input, true);
 
@@ -52,11 +62,14 @@ class Telegram implements NetworkInterface
             $messages[] = $datas;
         }
 
-        $this->app['monolog']->addDebug(json_encode($messages));
+        $this->container->get('monolog')->debug(json_encode($messages));
 
         return $messages;
     }
 
+    /**
+     * @param array<string, array<string, string>> $messages
+     */
     public function process(array $messages): void
     {
         foreach ($messages as $message) {
@@ -64,7 +77,7 @@ class Telegram implements NetworkInterface
         }
     }
 
-    public function sendAPIRequestJson(string $method, array $parameters): string
+    public function sendAPIRequestJson(string $method, array $parameters): string|bool
     {
         if (!is_string($method)) {
             return false;
@@ -76,29 +89,34 @@ class Telegram implements NetworkInterface
             return false;
         }
 
-        $parameters['method'] = $method;
+        try {
+            $response = $this->container->get('curl')->post(
+                $this->endpoint,
+                ['json' => array_merge(['method' => $method], $parameters['message'])]
+            );
+            return $response->getBody();
+        } catch (ClientException $e) {
+            $exception = $e->getResponse();
 
-        $this->app['curl']->setopt(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        $this->app['curl']->setopt(CURLOPT_RETURNTRANSFER, true);
-        $this->app['curl']->setopt(CURLOPT_CONNECTTIMEOUT, 5);
-        $this->app['curl']->setopt(CURLOPT_TIMEOUT, 60);
-        $this->app['curl']->post($this->endpoint, json_encode($parameters));
-
-        if ($this->app['curl']->error) {
-            $this->app['monolog']->addError($this->app['curl']->error_code.':'.$this->app['curl']->response);
+            $this->container->get('monolog')->error(
+                sprintf(
+                    '%d:%s',
+                    $exception->getStatusCode(),
+                    $exception->getReasonPhrase(),
+                )
+            );
+            return Psr7\Message::toString($exception);
         }
-        
-        return $this->app['curl']->response;
     }
 
     public function sendRandomAnswer(string $chat_id): void
     {
         $answer = (mt_rand(0, 1) > 0.5) ? 'Yes.' : 'No.';
 
-        $this->sendAPIRequestJson('sendMessage', [
+        $this->sendAPIRequestJson('sendMessage', ['message' => [
             'chat_id' => $chat_id,
             'text' => $answer,
             'parse_mode' => 'Markdown'
-        ]);
+        ]]);
     }
 }

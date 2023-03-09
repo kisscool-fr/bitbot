@@ -3,8 +3,6 @@ parameters:
     paths:
         - bin
         - lib
-        - web
+        - public
     ignoreErrors:
-        - '#.+ has no typehint specified#'
-        - '#.+ should return string but returns false#'
-        - '#.+ expects array#'
+        - '#Cannot call method .+ on mixed.#'

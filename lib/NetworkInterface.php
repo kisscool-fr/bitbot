@@ -2,24 +2,33 @@
 
 namespace Bitbot;
 
-use Silex\Application;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
 
 interface NetworkInterface
 {
-    public function main(Request $request, Application $app): Response;
     /**
-     * @return array<array>
+     * @param Request $request
+     * @param Response $response
+     * @param array<string, string> $args
+     * @return Response
+     */
+    public function main(Request $request, Response $response, array $args): Response;
+
+    /**
+     * @return array<mixed>
      */
     public function decode(): array;
+
     /**
-     * @param array<array> $messages
+     * @param array<array<string, string>> $messages
      */
     public function process(array $messages): void;
 
     /**
-     * @param array<string, string> $parameters
+     * @param string $method
+     * @param array<string, array<string, string>> $parameters
+     * @return string|bool
      */
-    public function sendAPIRequestJson(string $method, array $parameters): string;
+    public function sendAPIRequestJson(string $method, array $parameters): string|bool;
 }

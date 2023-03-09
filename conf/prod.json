@@ -1,5 +1,5 @@
 {
-    "$extends": "dev",
+    "env": "%APP_ENV%",
     "debug": false,
     "network": {
         "facebook": {

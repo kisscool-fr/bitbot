@@ -1,5 +1,5 @@
 {
-    "env": "%__ENV__%",
+    "env": "%APP_ENV%",
     "debug": true,
     "network": {
         "facebook": {

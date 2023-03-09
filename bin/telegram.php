@@ -2,13 +2,14 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+if (!isset($argv[1])) {
+    die('Usage: ' . $argv[0] . ' <webhook_url|delete>' . PHP_EOL);
+}
+
 Dotenv\Dotenv::createImmutable(__DIR__ . '/../')->load();
 
-$curl = new Curl\Curl();
-
-if (!isset($argv[1]))
-{
-    die('Usage: ' . $argv[0] . ' <webhook_url|delete>' . PHP_EOL);
+if (!array_key_exists('TELEGRAM_TOKEN', $_ENV)) {
+    die('Missing TELEGRAM_TOKEN environment variable' . PHP_EOL);
 }
 
 $url = $argv[1];
@@ -16,10 +17,9 @@ $delete = ($url == 'delete');
 
 $parameters = ['url' => ($delete ? '' : $url)];
 
-$url = 'https://api.telegram.org/bot' . getenv('TELEGRAM_TOKEN') . '/setWebhook?' . http_build_query($parameters);
+$url = 'https://api.telegram.org/bot' . $_ENV['TELEGRAM_TOKEN'] . '/setWebhook';
 
-$curl->setopt(CURLOPT_RETURNTRANSFER, true);
-$curl->setopt(CURLOPT_CONNECTTIMEOUT, 5);
-$curl->setopt(CURLOPT_TIMEOUT, 60);
-$curl->get($url);
-var_dump($curl->response);
+$curl = new GuzzleHttp\Client(['connect_timeout' => 5, 'timeout' => 60]);
+$response = $curl->get($url, ['query' => $parameters]);
+
+var_dump($response->getBody());
