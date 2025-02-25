@@ -7,7 +7,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\ClientException;
-
 use Bitbot\NetworkInterface;
 
 class Facebook implements NetworkInterface
@@ -33,7 +32,7 @@ class Facebook implements NetworkInterface
             array_key_exists('hub_verify_token', $query_string) &&
             $query_string['hub_verify_token'] == $this->container->get('config')->get('network.facebook.app_token')
         ) {
-            $response->getBody()->write($query_string['hub_challenge']);
+            $response->getBody()->write(strval($query_string['hub_challenge']));
         } else {
             $response->getBody()->write('Failed validation. Make sure the validation tokens match.');
             $response = $response->withStatus(403);
@@ -47,7 +46,7 @@ class Facebook implements NetworkInterface
         /** @var array<array<string, string>> $messages */
         $messages = $this->decode();
 
-        $this->container->get('monolog')->debug('count messages:'.count($messages));
+        $this->container->get('monolog')->debug(sprintf('count messages:%d', count($messages)));
 
         if (count($messages) == 0) {
             $response->getBody()->write('');
@@ -112,14 +111,8 @@ class Facebook implements NetworkInterface
 
     public function sendAPIRequestJson(string $method, array $parameters): string|bool
     {
-        if (!is_string($method)) {
-            return false;
-        }
-
         if (!$parameters) {
             $parameters = [];
-        } elseif (!is_array($parameters)) {
-            return false;
         }
 
         $this->container->get('monolog')->debug(json_encode($parameters));

@@ -7,7 +7,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\ClientException;
-
 use Bitbot\NetworkInterface;
 
 class Slack implements NetworkInterface
@@ -89,7 +88,10 @@ class Slack implements NetworkInterface
         }
 
         $response->getBody()->write(
-            '<a href="https://slack.com/oauth/authorize?scope=bot&client_id='.$this->container->get('config')->get('network.slack.client.id').'"><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>'
+            sprintf(
+                '<a href="https://slack.com/oauth/authorize?scope=bot&client_id=%s"><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>', // phpcs:ignore
+                $this->container->get('config')->get('network.slack.client.id')
+            )
         );
         return $response;
     }
@@ -99,7 +101,7 @@ class Slack implements NetworkInterface
         /** @var array<string, array<string, string>> $messages */
         $messages = $this->decode();
 
-        $this->container->get('monolog')->debug('count messages:'.count($messages));
+        $this->container->get('monolog')->debug(sprintf('count messages:%d', count($messages)));
 
         if (count($messages) == 0) {
             $response->getBody()->write('');
@@ -150,14 +152,8 @@ class Slack implements NetworkInterface
 
     public function sendAPIRequestJson(string $method, array $parameters): string|bool
     {
-        if (!is_string($method)) {
-            return false;
-        }
-
         if (!$parameters) {
             $parameters = [];
-        } elseif (!is_array($parameters)) {
-            return false;
         }
 
         $this->container->get('monolog')->debug(json_encode($parameters));

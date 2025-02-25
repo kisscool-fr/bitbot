@@ -1,8 +1,9 @@
 parameters:
-    level: max
+    level: 8
     paths:
         - bin
         - lib
         - public
-    ignoreErrors:
-        - '#Cannot call method .+ on mixed.#'
+    parallel:
+        maximumNumberOfProcesses: 4
+    tipsOfTheDay: false

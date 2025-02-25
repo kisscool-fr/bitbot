@@ -17,7 +17,7 @@ $delete = ($url == 'delete');
 
 $parameters = ['url' => ($delete ? '' : $url)];
 
-$url = 'https://api.telegram.org/bot' . $_ENV['TELEGRAM_TOKEN'] . '/setWebhook';
+$url = sprintf('https://api.telegram.org/bot%s/setWebhook', strval(getenv('TELEGRAM_TOKEN')));
 
 $curl = new GuzzleHttp\Client(['connect_timeout' => 5, 'timeout' => 60]);
 $response = $curl->get($url, ['query' => $parameters]);

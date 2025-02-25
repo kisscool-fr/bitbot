@@ -7,7 +7,6 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\ClientException;
-
 use Bitbot\NetworkInterface;
 
 class Telegram implements NetworkInterface
@@ -30,7 +29,7 @@ class Telegram implements NetworkInterface
         /** @var array<string, array<string, string>> $messages */
         $messages = $this->decode();
 
-        $this->container->get('monolog')->debug('count messages:'.count($messages));
+        $this->container->get('monolog')->debug(sprintf('count messages:%d', count($messages)));
 
         if (count($messages) == 0) {
             $response->getBody()->write('');
@@ -79,14 +78,8 @@ class Telegram implements NetworkInterface
 
     public function sendAPIRequestJson(string $method, array $parameters): string|bool
     {
-        if (!is_string($method)) {
-            return false;
-        }
-
         if (!$parameters) {
             $parameters = [];
-        } elseif (!is_array($parameters)) {
-            return false;
         }
 
         try {
