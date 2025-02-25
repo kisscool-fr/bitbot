@@ -1,13 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="true" colors="true">
+<phpunit
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.4/phpunit.xsd"
+  backupGlobals="true" 
+  bootstrap="tests/bootstrap.php"
+  colors="true"
+  executionOrder="depends,defects"
+  beStrictAboutOutputDuringTests="true"
+  failOnRisky="true"
+  failOnWarning="true"
+  cacheDirectory=".phpunit.cache"
+  requireCoverageMetadata="false"
+  beStrictAboutCoverageMetadata="true"
+>
+  <php>
+    <env name="APP_ENV" value="test"/>
+  </php>
   <testsuites>
     <testsuite name="Bitbot">
       <directory>tests</directory>
     </testsuite>
   </testsuites>
-  <filter>
-    <whitelist>
+  <coverage/>
+  <source>
+    <include>
       <directory suffix=".php">lib</directory>
-    </whitelist>
-</filter>
+    </include>
+  </source>
 </phpunit>
