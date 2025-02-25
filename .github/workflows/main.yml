@@ -59,11 +59,17 @@ jobs:
     - name: PHP Lint
       run: composer lint
 
+    - name: PHP PSR12
+      run: composer standard
+
     - name: PHPStan
       run: composer stan
 
     - name: PHP-CS-Fixer
       run: composer style
+
+    - name: Code Security Audit
+      run: composer scan
 
   test:
     needs: ['pre-check', check]
