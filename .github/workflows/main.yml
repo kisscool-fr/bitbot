@@ -13,19 +13,19 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.0.28'
+        php-version: '8.1'
 
     - name: Validate composer.json and composer.lock
-      run: composer validate --no-check-all --strict
+      run: composer check
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -40,43 +40,46 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.0.28'
+        php-version: '8.1'
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-
 
+    - name: PHP Lint
+      run: composer lint
+
     - name: PHPStan
-      run: ./vendor/bin/phpstan analyse --configuration=phpstan.neon
+      run: composer stan
 
     - name: PHP-CS-Fixer
-      run: ./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --dry-run
+      run: composer style
 
   test:
     needs: ['pre-check', check]
     runs-on: ubuntu-22.04
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.0.28'
+        php-version: '8.1'
 
     - name: Cache Composer packages
       id: composer-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: vendor
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
@@ -84,4 +87,19 @@ jobs:
           ${{ runner.os }}-php-
 
     - name: PHPUnit
-      run: ./vendor/bin/phpunit
+      run: composer test
+
+  scan:
+    needs: ['pre-check']
+    name: gitleaks
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Secret Scanning
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITLEAKS_ENABLE_COMMENTS: false

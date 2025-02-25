@@ -2,7 +2,6 @@ backup/
 logs/
 vendor/
 
-sftp-config.json
 .env
 
 docker-compose.yml
@@ -10,6 +9,7 @@ Dockerfile
 docker/
 Makefile
 .vscode/
+.gitleaks.toml
 
 .dccache
 *.code-workspace
