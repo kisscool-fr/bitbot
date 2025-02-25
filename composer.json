@@ -1,9 +1,9 @@
 {
     "name": "kisscool/bitbot",
     "description": "Bitbot. I'm a bit. Yes. No",
+    "type": "project",
     "homepage": "https://bitbot.kisscool.net",
     "license": "MIT",
-    "version": "1.2.0",
     "authors": [
         {
             "name": "KisSCoOl",
@@ -16,7 +16,10 @@
         "platform": {
             "php": "8.1.29"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     },
     "autoload": {
         "psr-4": {
@@ -25,7 +28,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Bitbot\\": "tests/"
+            "Bitbot\\Tests\\": "tests/"
         }
     },
     "require": {
@@ -40,18 +43,23 @@
         "vlucas/phpdotenv": "^5.6"
     },
     "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
         "friendsofphp/php-cs-fixer": "^3.70",
         "mockery/mockery": "^1.6",
-        "phpstan/phpstan": "^1.10",
-        "phpunit/phpunit": "^9.6",
-        "roave/security-advisories": "dev-master"
+        "pheromone/phpcs-security-audit": "^2.0",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^10.5",
+        "roave/security-advisories": "dev-master",
+        "squizlabs/php_codesniffer": "^3.11"
     },
     "scripts": {
         "check": "composer validate --no-check-all --strict",
         "lint": "php -l bin/ lib/ public/ tests/",
+        "standard": "./vendor/bin/phpcs --extensions=php --standard=PSR12 bin/ lib/ public/ tests/",
+        "scan": "./vendor/bin/phpcs --extensions=php --standard=./vendor/pheromone/phpcs-security-audit/example_base_ruleset.xml lib/",
         "stan": "./vendor/bin/phpstan analyse --configuration=phpstan.neon",
         "style": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --dry-run --diff --show-progress dots",
         "style-fix": "./vendor/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --diff --show-progress dots",
-        "test": "./vendor/bin/phpunit"
+        "test": "./vendor/bin/phpunit --color=always --display-errors"
     }
 }
